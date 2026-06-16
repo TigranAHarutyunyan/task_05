@@ -54,7 +54,7 @@ tm = {
   name                   = "cmaz-j5tku7ra-mod5-traf"
   traffic_routing_method = "Performance"
 }
-endpoint = "tm-app"
-allow_tm_rule_name="allow-tm"
+endpoint           = "tm-app"
+allow_tm_rule_name = "allow-tm"
 
 creator = "tigran_harutyunyan@epam.com"
