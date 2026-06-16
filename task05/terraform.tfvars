@@ -55,6 +55,6 @@ tm = {
   traffic_routing_method = "Performance"
 }
 endpoint = "tm-app"
-
+allow_tm_rule_name="allow-tm"
 
 creator = "tigran_harutyunyan@epam.com"

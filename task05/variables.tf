@@ -46,3 +46,6 @@ variable "endpoint" {
   description = "Name of Endpoint"
   type        = string
 }
+variable "allow_tm_rule_name" {
+  type = string
+}
