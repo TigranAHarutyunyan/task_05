@@ -5,8 +5,8 @@ resource "azurerm_windows_web_app" "this" {
   service_plan_id     = var.service_plan_id
 
   site_config {
-    always_on = true
-
+    always_on                     = true
+    ip_restriction_default_action = "Deny"
     dynamic "ip_restriction" {
       for_each = var.ip_restrictions
       iterator = rule

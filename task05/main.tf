@@ -37,11 +37,13 @@ module "webapp" {
     {
       name       = each.value.allow_IP_rule_name
       action     = "Allow"
+      priority   = 100
       ip_address = each.value.Verification_IP_address
     },
     {
       name        = var.allow_tm_rule_name
       action      = "Allow"
+      priority    = 101
       service_tag = "AzureTrafficManager"
     }
   ]
