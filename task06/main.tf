@@ -48,7 +48,7 @@ module "sql" {
   administrator_login    = random_string.sql_admin_username.result
   administrator_password = random_password.sql_admin_password.result
   region                 = azurerm_resource_group.rg.location
-  tenant_id              = data.azurerm_client_config.current.tenant_id
+  tenant_id              = azurerm_client_config.current.tenant_id
   rg_name                = azurerm_resource_group.rg.name
   name_of_firewall       = var.name_of_firewall
   allowed_ip_address     = var.allowed_ip_address
