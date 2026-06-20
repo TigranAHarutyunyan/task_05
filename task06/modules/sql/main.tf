@@ -10,7 +10,7 @@ resource "azurerm_mssql_server" "sql_server" {
   }
 }
 resource "azurerm_mssql_database" "sql_database" {
-  name      = var.server_name
+  name      = var.db_name
   server_id = azurerm_mssql_server.sql_server.id
   sku_name  = "S2"
 
