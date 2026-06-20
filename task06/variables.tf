@@ -54,7 +54,3 @@ variable "sku_plan" {
   type        = string
   description = "name of plan"
 }
-variable "sql_admin_username" {
-  description = "Usernaame of sql "
-  type        = string
-}

@@ -2,6 +2,11 @@ provider "azurerm" {
   features {}
 
 }
+resource "random_string" "" {
+  length  = 12
+  special = false
+  upper   = false
+}
 
 resource "random_password" "sql_admin_password" {
   length           = 16
@@ -18,7 +23,7 @@ data "azurerm_key_vault" "existing_kv" {
 }
 resource "azurerm_key_vault_secret" "sql_admin_username" {
   name         = var.key_vault_name_for_sql
-  value        = var.sql_admin_username
+  value        = random_string.sql_admin_username.result
   key_vault_id = data.azurerm_key_vault.existing_kv.id
 }
 resource "azurerm_key_vault_secret" "sql_admin_password" {
