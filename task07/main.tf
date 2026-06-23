@@ -31,13 +31,12 @@ module "cdn" {
   rg_name            = azurerm_resource_group.rg.name
   host_name          = azurerm_storage_account.sa.primary_blob_host
   origin_host_header = azurerm_storage_account.sa.primary_blob_host
-
-  endpoint_name = local.cdn_endpoint_name
-  location      = azurerm_resource_group.rg.location
-  og_name       = local.cdn_origin_group_name
-  profiler_name = local.cdn_profile_name
-  sku_name      = var.fw_sku_name
-  route_name    = var.fw_route_name
-  origin_name   = local.cdn_origin_name
+  endpoint_name      = local.cdn_endpoint_name
+  location           = azurerm_resource_group.rg.location
+  og_name            = local.cdn_origin_group_name
+  profiler_name      = local.cdn_profile_name
+  sku_name           = var.fw_sku_name
+  route_name         = var.fw_route_name
+  origin_name        = local.cdn_origin_name
 
 }
