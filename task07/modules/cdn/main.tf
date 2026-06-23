@@ -1,3 +1,4 @@
+
 resource "azurerm_cdn_frontdoor_profile" "fd" {
   name                = var.profiler_name
   sku_name            = var.sku_name
