@@ -21,11 +21,11 @@ resource "azurerm_storage_account" "sa" {
 
 import {
   to = azurerm_resource_group.rg
-  id = var.sub_id
+  id = "/subscriptions/8bb65153-67c2-4fdf-aa84-6a4e4171adb5/resourceGroups/cmtr-j5tku7ra-mod7-rg/providers/Microsoft.Storage/storageAccounts/cmtrj5tku7ramod7sa"
 }
 import {
   to = azurerm_storage_account.sa
-  id = var.storage_id
+  id = "/subscriptions/8bb65153-67c2-4fdf-aa84-6a4e4171adb5/resourceGroups/cmtr-j5tku7ra-mod7-rg"
 }
 module "cdn" {
   source             = "./modules/cdn"

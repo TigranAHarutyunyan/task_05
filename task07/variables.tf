@@ -1,11 +1,3 @@
-variable "sub_id" {
-  type        = string
-  description = "Id of Subscription"
-}
-variable "storage_id" {
-  type        = string
-  description = "id of Storage Account "
-}
 variable "file_name_storage" {
   type        = string
   description = "Name of file in the Storage account"
