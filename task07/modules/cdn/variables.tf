@@ -38,3 +38,7 @@ variable "origin_host_header" {
   type        = string
   description = "Origin host header"
 }
+variable "cdn_origin_path" {
+  type        = string
+  description = "The blob  container path to use as CDN origin path"
+}

@@ -30,3 +30,7 @@ variable "fw_route_name" {
   type        = string
   description = "route name"
 }
+variable "cdn_origin_path" {
+  type        = string
+  description = "The blob container path to use as CDN origin path"
+}

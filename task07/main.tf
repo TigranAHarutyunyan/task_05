@@ -38,5 +38,5 @@ module "cdn" {
   sku_name           = var.fw_sku_name
   route_name         = var.fw_route_name
   origin_name        = local.cdn_origin_name
-
+  cdn_origin_path    = var.cdn_origin_path
 }
