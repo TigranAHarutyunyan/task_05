@@ -41,7 +41,7 @@ resource "azurerm_cdn_frontdoor_route" "route" {
   cdn_frontdoor_origin_group_id = azurerm_cdn_frontdoor_origin_group.og.id
   cdn_frontdoor_origin_ids      = [azurerm_cdn_frontdoor_origin.origin.id]
   supported_protocols           = ["Http", "Https"]
-  patterns_to_match             = ["/*"]
+  patterns_to_match             = ["/mycontainer/*"]
   forwarding_protocol           = "HttpsOnly"
   https_redirect_enabled        = true
   enabled                       = true
