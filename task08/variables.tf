@@ -47,6 +47,35 @@ variable "key_vault_redis_primary_key" {
   description = "name of primary key "
 }
 variable "acr_sku" {
-  type =  string
+  type        = string
   description = "type of acr"
+}
+variable "git_pat" {
+  type        = string
+  sensitive   = true
+  description = "Git access token"
+}
+variable "dockerfile_path" {
+  type        = string
+  description = "Path of Dockerfile"
+}
+variable "pool_name" {
+  type        = string
+  description = "Name of Pool"
+}
+variable "pool_instance_count" {
+  type        = number
+  description = "Count of instances"
+}
+variable "pool_instance_node_size" {
+  type        = string
+  description = "Size of  instances"
+}
+variable "pool_disk_type" {
+  type        = string
+  description = "disk type "
+}
+variable "context_path" {
+  type        = string
+  description = "Path to the Source code "
 }

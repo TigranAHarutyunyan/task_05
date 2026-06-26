@@ -10,7 +10,7 @@ variable "location" {
   type        = string
   description = "Location"
 }
-variable "tenand_id" {
+variable "tenant_id" {
   type        = string
   description = "Tenand Id"
 }
@@ -37,4 +37,8 @@ variable "key_vault_redis_hostname" {
 variable "key_vault_redis_primary_key" {
   type        = string
   description = "name of primary key "
+}
+variable "sp_object_id" {
+  type        = string
+  description = "Object ID of the Terraform Service Principal"
 }

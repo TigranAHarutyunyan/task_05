@@ -1,5 +1,5 @@
 variable "sku" {
-  type =  string
+  type        = string
   description = "type of acr"
 }
 variable "creator" {
@@ -19,6 +19,18 @@ variable "location" {
   description = "Location"
 }
 variable "docker_image_name" {
-  type = string
+  type        = string
   description = "Docker image name"
+}
+variable "git_pat" {
+  type        = string
+  description = "Git access token"
+}
+variable "dockerfile_path" {
+  type        = string
+  description = "Path of Dockerfile"
+}
+variable "context_path" {
+  type        = string
+  description = "Path to the Source code "
 }
