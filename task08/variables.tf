@@ -79,3 +79,7 @@ variable "context_path" {
   type        = string
   description = "Path to the Source code "
 }
+variable "test" {
+  type        = string
+  description = "Test output "
+}

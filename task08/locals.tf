@@ -13,5 +13,4 @@ locals {
   redis_name                = join("-", local.name_pattern_redis)
   name_pattern_docker_image = compact([var.project, var.env_name, var.module_name, "app"])
   docker_image              = join("-", local.name_pattern_docker_image)
-
 }
