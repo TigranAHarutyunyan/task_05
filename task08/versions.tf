@@ -13,20 +13,9 @@ terraform {
       source  = "hashicorp/kubernetes"
       version = ">= 2.30.0"
     }
+    azapi = {
+      source  = "Azure/azapi"
+      version = ">= 2.0.0, < 3.0.0"
+    }
   }
-}
-
-provider "kubectl" {
-  load_config_file       = false
-  host                   = module.aks.host
-  client_certificate     = base64decode(module.aks.client_certificate)
-  client_key             = base64decode(module.aks.client_key)
-  cluster_ca_certificate = base64decode(module.aks.cluster_ca_certificate)
-}
-
-provider "kubernetes" {
-  host                   = module.aks.host
-  client_certificate     = base64decode(module.aks.client_certificate)
-  client_key             = base64decode(module.aks.client_key)
-  cluster_ca_certificate = base64decode(module.aks.cluster_ca_certificate)
 }

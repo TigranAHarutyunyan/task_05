@@ -2,6 +2,8 @@ provider "azurerm" {
   features {}
 }
 
+provider "azapi" {}
+
 resource "azurerm_resource_group" "rg" {
   name     = local.rg_name
   location = var.location
@@ -80,8 +82,8 @@ module "aks" {
   tenant_id               = data.azurerm_client_config.current.tenant_id
 }
 
-resource "kubectl_manifest" "secret_provider" {
-  yaml_body = templatefile("${path.module}/k8s-manifests/secret-provider.yaml.tftpl", {
+locals {
+  secret_provider_manifest = templatefile("${path.module}/k8s-manifests/secret-provider.yaml.tftpl", {
     aks_kv_access_identity_id  = module.aks.key_vault_secrets_provider_client_id
     kv_name                    = module.keyvault.key_vault_name
     redis_url_secret_name      = var.key_vault_redis_hostname
@@ -89,45 +91,64 @@ resource "kubectl_manifest" "secret_provider" {
     tenant_id                  = data.azurerm_client_config.current.tenant_id
   })
 
-  depends_on = [module.aks]
-}
-
-resource "kubectl_manifest" "app_deployment" {
-  yaml_body = templatefile("${path.module}/k8s-manifests/deployment.yaml.tftpl", {
+  deployment_manifest = templatefile("${path.module}/k8s-manifests/deployment.yaml.tftpl", {
     acr_login_server = module.acr.login_server
     app_image_name   = local.docker_image
     image_tag        = "latest"
   })
 
-  wait_for {
-    field {
-      key   = "status.availableReplicas"
-      value = "1"
-    }
-  }
+  service_manifest = file("${path.module}/k8s-manifests/service.yaml")
 
-  depends_on = [kubectl_manifest.secret_provider]
+  apply_k8s_manifests_command = <<-EOT
+set -e
+
+for i in $(seq 1 60); do
+  if kubectl get crd secretproviderclasses.secrets-store.csi.x-k8s.io >/dev/null 2>&1; then
+    break
+  fi
+  sleep 10
+done
+
+kubectl get crd secretproviderclasses.secrets-store.csi.x-k8s.io
+
+printf '%s' '${base64encode(local.secret_provider_manifest)}' | base64 -d | kubectl apply -n default -f -
+printf '%s' '${base64encode(local.deployment_manifest)}' | base64 -d | kubectl apply -n default -f -
+printf '%s' '${base64encode(local.service_manifest)}' | base64 -d | kubectl apply -n default -f -
+
+kubectl rollout status deployment/redis-flask-app -n default --timeout=10m
+
+for i in $(seq 1 60); do
+  ip=$(kubectl get service redis-flask-app-service -n default -o jsonpath='{.status.loadBalancer.ingress[0].ip}' 2>/dev/null)
+  if [ -n "$ip" ]; then
+    echo "$ip"
+    exit 0
+  fi
+  sleep 10
+done
+
+kubectl get service redis-flask-app-service -n default
+exit 1
+EOT
+
+  aks_manifest_apply_logs = try(
+    azapi_resource_action.apply_k8s_manifests.output.properties.logs,
+    jsondecode(azapi_resource_action.apply_k8s_manifests.output).properties.logs,
+    ""
+  )
 }
 
-resource "kubectl_manifest" "app_service" {
-  yaml_body = file("${path.module}/k8s-manifests/service.yaml")
+resource "azapi_resource_action" "apply_k8s_manifests" {
+  type        = "Microsoft.ContainerService/managedClusters@2024-05-01"
+  resource_id = module.aks.id
+  action      = "runCommand"
+  method      = "POST"
 
-  wait_for {
-    field {
-      key        = "status.loadBalancer.ingress.[0].ip"
-      value      = "^(\\d+(\\.|$)){4}"
-      value_type = "regex"
-    }
+  body = {
+    command = local.apply_k8s_manifests_command
+    context = ""
   }
 
-  depends_on = [kubectl_manifest.app_deployment]
-}
+  response_export_values = ["*"]
 
-data "kubernetes_service_v1" "app" {
-  metadata {
-    name      = "redis-flask-app-service"
-    namespace = "default"
-  }
-
-  depends_on = [kubectl_manifest.app_service]
+  depends_on = [module.aks]
 }

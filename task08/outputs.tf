@@ -4,6 +4,6 @@ output "aci_fqdn" {
 }
 
 output "aks_lb_ip" {
-  value       = data.kubernetes_service_v1.app.status[0].load_balancer[0].ingress[0].ip
+  value       = try(regex("[0-9]+\\.[0-9]+\\.[0-9]+\\.[0-9]+", local.aks_manifest_apply_logs), "")
   description = "IP of the Load Balancer"
 }
