@@ -65,47 +65,17 @@ module "redis" {
   creator  = var.creator
 }
 
-resource "azurerm_kubernetes_cluster" "aks" {
-  name                = local.aks_name
-  location            = azurerm_resource_group.rg.location
-  resource_group_name = azurerm_resource_group.rg.name
-  dns_prefix          = "company"
-
-  default_node_pool {
-    name            = var.pool_name
-    node_count      = var.pool_instance_count
-    vm_size         = var.pool_instance_node_size
-    os_disk_type    = var.pool_disk_type
-    os_disk_size_gb = 100
-  }
-
-  key_vault_secrets_provider {
-    secret_rotation_enabled = true
-  }
-
-  identity {
-    type = "SystemAssigned"
-  }
-
-  oidc_issuer_enabled       = true
-  workload_identity_enabled = true
-
-  tags = {
-    Creator = var.creator
-  }
-
-  depends_on = [module.keyvault]
-}
-
-resource "azurerm_role_assignment" "acr_pull" {
-  scope                = module.acr.acr_id
-  role_definition_name = "ACRpull"
-  principal_id         = azurerm_kubernetes_cluster.aks.kubelet_identity[0].object_id
-}
-
-resource "azurerm_key_vault_access_policy" "aks_secrets_provider" {
-  key_vault_id       = module.keyvault.key_vault_id
-  object_id          = azurerm_kubernetes_cluster.aks.key_vault_secrets_provider[0].secret_identity[0].object_id
-  secret_permissions = ["Get", "List"]
-  tenant_id          = data.azurerm_client_config.current.tenant_id
+module "aks" {
+  source                  = "./modules/aks"
+  name                    = local.aks_name
+  location                = azurerm_resource_group.rg.location
+  rg_name                 = azurerm_resource_group.rg.name
+  pool_name               = var.pool_name
+  pool_instance_count     = var.pool_instance_count
+  pool_instance_node_size = var.pool_instance_node_size
+  pool_disk_type          = var.pool_disk_type
+  creator                 = var.creator
+  acr_id                  = module.acr.acr_id
+  key_vault_id            = module.keyvault.key_vault_id
+  tenant_id               = data.azurerm_client_config.current.tenant_id
 }

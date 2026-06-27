@@ -1,22 +1,54 @@
-variable "aks_kube_config" {
-  type = object({
-    host                   = string
-    client_certificate     = string
-    client_key             = string
-    cluster_ca_certificate = string
-  })
-  description = "AKS connection details for the Kubernetes providers"
+variable "name" {
+  type        = string
+  description = "Name of the AKS cluster"
 }
 
-variable "k8s_inputs" {
-  type = object({
-    acr_login_server           = string
-    app_image_name             = string
-    aks_kv_access_identity_id  = string
-    key_vault_name             = string
-    redis_url_secret_name      = string
-    redis_password_secret_name = string
-    tenant_id                  = string
-  })
-  description = "Inputs required to render and apply the Kubernetes manifests"
+variable "location" {
+  type        = string
+  description = "Azure region for the AKS cluster"
+}
+
+variable "rg_name" {
+  type        = string
+  description = "Resource group name for the AKS cluster"
+}
+
+variable "pool_name" {
+  type        = string
+  description = "Name of the default AKS node pool"
+}
+
+variable "pool_instance_count" {
+  type        = number
+  description = "Number of nodes in the default AKS node pool"
+}
+
+variable "pool_instance_node_size" {
+  type        = string
+  description = "VM size for the default AKS node pool"
+}
+
+variable "pool_disk_type" {
+  type        = string
+  description = "OS disk type for the default AKS node pool"
+}
+
+variable "creator" {
+  type        = string
+  description = "Creator tag value"
+}
+
+variable "acr_id" {
+  type        = string
+  description = "Azure Container Registry resource ID"
+}
+
+variable "key_vault_id" {
+  type        = string
+  description = "Key Vault resource ID"
+}
+
+variable "tenant_id" {
+  type        = string
+  description = "Azure tenant ID"
 }

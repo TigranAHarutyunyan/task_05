@@ -1,76 +1,52 @@
 terraform {
   required_version = ">= 1.5.7"
   required_providers {
-    kubernetes = {
-      source  = "hashicorp/kubernetes"
-      version = ">= 2.30.0"
-    }
-    kubectl = {
-      source  = "alekc/kubectl"
-      version = ">= 1.14.0"
+    azurerm = {
+      source  = "hashicorp/azurerm"
+      version = ">= 3.110.0, < 4.0.0"
     }
   }
 }
 
-provider "kubernetes" {
-  host                   = var.aks_kube_config.host
-  client_certificate     = base64decode(var.aks_kube_config.client_certificate)
-  client_key             = base64decode(var.aks_kube_config.client_key)
-  cluster_ca_certificate = base64decode(var.aks_kube_config.cluster_ca_certificate)
-}
+resource "azurerm_kubernetes_cluster" "aks" {
+  name                = var.name
+  location            = var.location
+  resource_group_name = var.rg_name
+  dns_prefix          = "company"
 
-provider "kubectl" {
-  load_config_file       = false
-  host                   = var.aks_kube_config.host
-  client_certificate     = base64decode(var.aks_kube_config.client_certificate)
-  client_key             = base64decode(var.aks_kube_config.client_key)
-  cluster_ca_certificate = base64decode(var.aks_kube_config.cluster_ca_certificate)
-}
-
-data "kubernetes_service_v1" "app" {
-  metadata {
-    name      = "redis-flask-app-service"
-    namespace = "default"
+  default_node_pool {
+    name            = var.pool_name
+    node_count      = var.pool_instance_count
+    vm_size         = var.pool_instance_node_size
+    os_disk_type    = var.pool_disk_type
+    os_disk_size_gb = 100
   }
 
-  depends_on = [kubectl_manifest.app_service]
-}
-
-resource "kubectl_manifest" "app_deployment" {
-  yaml_body = templatefile("${path.module}/../k8s-manifests/deployment.yaml.tftpl", {
-    acr_login_server = var.k8s_inputs.acr_login_server
-    app_image_name   = var.k8s_inputs.app_image_name
-    image_tag        = "latest"
-  })
-
-  wait_for {
-    field {
-      key   = "status.availableReplicas"
-      value = "1"
-    }
+  key_vault_secrets_provider {
+    secret_rotation_enabled = true
   }
 
-  depends_on = [kubectl_manifest.secret_provider]
-}
+  identity {
+    type = "SystemAssigned"
+  }
 
-resource "kubectl_manifest" "app_service" {
-  yaml_body = file("${path.module}/../k8s-manifests/service.yaml")
+  oidc_issuer_enabled       = true
+  workload_identity_enabled = true
 
-  wait_for {
-    field {
-      key        = "status.loadBalancer.ingress.[0].ip"
-      value      = "^(\\d+(\\.|$)){4}"
-      value_type = "regex"
-    }
+  tags = {
+    Creator = var.creator
   }
 }
 
-resource "kubectl_manifest" "secret_provider" {
-  yaml_body = templatefile("${path.module}/../k8s-manifests/secret-provider.yaml.tftpl", {
-    aks_kv_access_identity_id  = var.k8s_inputs.aks_kv_access_identity_id
-    kv_name                    = var.k8s_inputs.key_vault_name
-    redis_url_secret_name      = var.k8s_inputs.redis_url_secret_name
-    redis_password_secret_name = var.k8s_inputs.redis_password_secret_name
-    tenant_id                  = var.k8s_inputs.tenant_id
-  })
+resource "azurerm_role_assignment" "acr_pull" {
+  scope                = var.acr_id
+  role_definition_name = "AcrPull"
+  principal_id         = azurerm_kubernetes_cluster.aks.kubelet_identity[0].object_id
+}
+
+resource "azurerm_key_vault_access_policy" "aks_secrets_provider" {
+  key_vault_id       = var.key_vault_id
+  object_id          = azurerm_kubernetes_cluster.aks.key_vault_secrets_provider[0].secret_identity[0].object_id
+  secret_permissions = ["Get", "List"]
+  tenant_id          = var.tenant_id
 }
