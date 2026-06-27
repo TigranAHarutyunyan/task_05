@@ -8,29 +8,13 @@ provider "kubernetes" {
   cluster_ca_certificate = base64decode(module.aks.kube_config[0].cluster_ca_certificate)
 }
 resource "local_file" "kubeconfig" {
-  content    = try(module.aks.kube_config_raw, module.aks.kube_config[0].raw_kube_config)
-  filename   = "${path.module}/kubeconfig_aks"
-  depends_on = [module.aks]
+  content  = try(module.aks.kube_config_raw, module.aks.kube_config[0].raw_kube_config)
+  filename = "${path.module}/kubeconfig_aks"
 }
 provider "kubectl" {
-  host                   = module.aks.kube_config[0].host
-  client_certificate     = base64decode(module.aks.kube_config[0].client_certificate)
-  client_key             = base64decode(module.aks.kube_config[0].client_key)
-  cluster_ca_certificate = base64decode(module.aks.kube_config[0].cluster_ca_certificate)
-  load_config_file       = false
-}
-
-resource "null_resource" "kubectl_apply" {
-  depends_on = [local_file.kubeconfig]
-
-  provisioner "local-exec" {
-    command     = <<EOT
-chmod 600 "${local_file.kubeconfig.filename}"
-export KUBECONFIG="${local_file.kubeconfig.filename}"
-kubectl apply -f ${path.module}/manifests
-EOT
-    interpreter = ["/bin/bash", "-c"]
-  }
+  load_config_file = true
+  config_path      = local_file.kubeconfig.filename
+  config_context   = try(module.aks.kube_config[0].context, "")
 }
 resource "azurerm_resource_group" "rg" {
   name     = local.rg_name
