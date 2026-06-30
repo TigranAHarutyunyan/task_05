@@ -14,7 +14,7 @@ resource "azurerm_container_group" "acg" {
   dns_name_label      = "redis-db"
   container {
     name   = "redis-container"
-    image  = "redis:7-alpine"
+    image = "${var.login-server}/redis:7-alpine"
     cpu    = 1
     memory = 1.5
     commands = [
