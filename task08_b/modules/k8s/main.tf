@@ -30,7 +30,7 @@ resource "kubectl_manifest" "secret-provider" {
     kv_name                    = var.kv-name
     redis_url_secret_name      = data.azurerm_key_vault_secret.hostname.value
     redis_password_secret_name = data.azurerm_key_vault_secret.password.value
-    depends_on = [kubectl_manifest.service]
+    depends_on                 = [kubectl_manifest.service]
   })
 }
 resource "kubectl_manifest" "service" {
