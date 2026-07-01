@@ -12,7 +12,7 @@ resource "azurerm_container_group" "acg" {
   sku                 = var.sku
   os_type             = "Linux"
   dns_name_label      = "redis-db"
-  ip_address_type = "Public"
+  ip_address_type     = "Public"
   container {
     name   = "redis-container"
     image  = "mcr.microsoft.com/cbl-mariner/base/redis:6"
@@ -20,7 +20,7 @@ resource "azurerm_container_group" "acg" {
     memory = 1.5
     commands = [
       "redis-server",
-      "--protected-mode ",  
+      "--protected-mode ",
       "no",
       "--requirepass",
       random_password.redis-password.result

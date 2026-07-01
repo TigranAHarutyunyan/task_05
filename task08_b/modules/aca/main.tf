@@ -44,7 +44,7 @@ resource "azurerm_container_app" "aca" {
     container {
       name   = "web-app"
       image  = "${var.aca-login-server}/${var.image_name}"
-      cpu    =  1
+      cpu    = 1
       memory = "2.0Gi"
       env {
         name  = "CREATOR"
