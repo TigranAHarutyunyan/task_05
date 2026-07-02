@@ -10,7 +10,3 @@ output "aks_lb_ip" {
   value       = module.k8s.aks_lb_ip
   description = "Load Balancer IP address"
 }
-output "redis_ip" {
-  value       = module.aci-redis.redis_ip
-  description = "Public IP address of Redis"
-}

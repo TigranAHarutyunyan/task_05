@@ -19,7 +19,9 @@ resource "azurerm_key_vault_access_policy" "kv-access-policy" {
     "Get",
     "List",
     "Set",
-    "Delete"
+    "Delete",
+    "Recover",
+    "Purge"
   ]
   key_permissions = [
     "Get",
